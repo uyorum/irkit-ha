@@ -9,6 +9,15 @@ get '/devices' do
   settings.devices.each do |device|
     devices << device['name']
   end
-  return devices.to_json
+  devices.to_json
 end
+
+get '/devices/:name' do
+  target_device = settings.devices.select {|device| device['name'] == params[:name]}.first
+  if target_device
+    return { name: target_device['name'] }.to_json
+  else
+    status 404
+    return {}.to_json
+  end
 end
