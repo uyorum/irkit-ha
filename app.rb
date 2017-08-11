@@ -1,12 +1,14 @@
 require 'sinatra'
-require 'yaml'
+require 'sinatra/config_file'
 
-devices = YAML.load_file('config/ir.yml')
+environment = ENV['RACK_ENV'] || 'development'
+config_file "config/#{environment}.yml"
 
 get '/devices' do
-  list = []
-  devices.each do |device|
-    list << device['name']
+  devices = []
+  settings.devices.each do |device|
+    devices << device['name']
   end
-  return list.to_json
+  return devices.to_json
+end
 end
