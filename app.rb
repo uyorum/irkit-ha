@@ -7,9 +7,13 @@ config_file "config/#{environment}.yml"
 
 before %r{/devices/([\w]+).*} do
   @target_device = settings.devices.select {|device| device['name'] == params[:captures].first}.first
-  unless @target_device
-    halt 404, { message: 'device not found' }.to_json
-  end
+  halt 404, { message: 'device not found' }.to_json unless @target_device
+end
+
+before '/devices/:device_name/exec' do
+  ir_json = @target_device['commands'][params[:command]]
+  halt 400, { message: "unknown command" }.to_json unless ir_json
+  @ir_data = JSON.parse(ir_json)
 end
 
 get '/devices' do
@@ -29,15 +33,8 @@ get '/devices/:device_name/commands' do
 end
 
 post '/devices/:device_name/exec' do
-  ir_json = @target_device['commands'][params[:command]]
-  unless ir_json
-    status 400
-    return { message: "unknown command" }.to_json
-  end
-
-  ir_data = IRKit::Response.new(JSON.parse(ir_json))
   irkit = IRKit::Device.new(address: @target_device['address'])
-  response = irkit.post_messages(ir_data)
+  response = irkit.post_messages(@ir_data)
   unless response.response.code == "200"
     status 500
     return { message: 'failed to execute command' }.to_json
