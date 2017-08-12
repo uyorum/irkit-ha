@@ -1,0 +1,42 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.getirkit.com/1/messages
+    body:
+      encoding: UTF-8
+      string: deviceid=YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY&clientkey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&message=%7B%22format%22%3A%22raw%22%2C%22freq%22%3A38%2C%22data%22%3A%5B11111%2C22222%5D%7D
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - openresty
+      Date:
+      - Sat, 12 Aug 2017 12:24:09 GMT
+      Content-Type:
+      - text/html; charset=utf-8
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Headers:
+      - X-Requested-With
+      X-Content-Type-Options:
+      - nosniff
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Sat, 12 Aug 2017 12:24:09 GMT
+recorded_with: VCR 3.0.3

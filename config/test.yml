@@ -1,7 +1,14 @@
 devices:
   - name: device1
+    type: irkit
     address: irkit
     commands:
       command1: '{"format":"raw","freq":38,"data":[11111,22222]}'
       command2: '{"format":"raw","freq":38,"data":[33333,44444,55555]}'
   - name: device2
+    type: internet_api
+    clientkey: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    deviceid: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+    commands:
+      command3: '{"format":"raw","freq":38,"data":[11111,22222]}'
+      command4: '{"format":"raw","freq":38,"data":[33333,44444,55555]}'

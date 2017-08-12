@@ -13,9 +13,18 @@ end
 all_devices = {}
 settings.devices.each do |device|
   name = device['name'].to_sym
+
+  case device['type']
+  when 'irkit'
+    api_client = IRKit::Device.new(address: device['address'])
+  when 'internet_api'
+    api_client = IRKit::InternetAPI.new(clientkey: device['clientkey'], deviceid: device['deviceid'])
+  end
+
   new_entry = Hashie::Mash.new(
     name: name,
-    api: IRKit::Device.new(address: device['address']),
+    type: device['type'],
+    api: api_client,
     commands: symbolize_keys(device['commands']),
   )
   all_devices[name] = new_entry
@@ -39,7 +48,7 @@ get '/devices' do
 end
 
 get '/devices/:device_name' do
-  { name: @target_device.name }.to_json
+  { name: @target_device.name, type: @target_device.type }.to_json
 end
 
 get '/devices/:device_name/commands' do
