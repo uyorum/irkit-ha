@@ -1,6 +1,6 @@
 require File.expand_path '../spec_helper.rb', __FILE__
 
-RSpec.describe "My Sinatra Application" do
+RSpec.describe "Sinatra Application" do
   describe "get /devices" do
     it "returns status 200" do
       get '/devices' do
@@ -14,7 +14,7 @@ RSpec.describe "My Sinatra Application" do
     end
   end
 
-  describe "get /devices/:name" do
+  describe "get /devices/:device_name" do
     context "with valid device name" do
       it "returns status 200" do
         get '/devices/livingroom'
@@ -40,7 +40,7 @@ RSpec.describe "My Sinatra Application" do
     end
   end
 
-  describe "get /devices/:name/commands" do
+  describe "get /devices/:device_name/commands" do
     context "with valid device name" do
       it "returns status 200" do
         get '/devices/livingroom/commands'
@@ -66,7 +66,7 @@ RSpec.describe "My Sinatra Application" do
     end
   end
 
-  describe "post /devices/:name/exec" do
+  describe "post /devices/:device_name/exec" do
     context "with valid request", vcr: true do
       let(:params) {{ command: 'command1' }}
 
