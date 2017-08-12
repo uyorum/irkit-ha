@@ -1,0 +1,18 @@
+FROM knjcode/rpi-ruby:2.4.1
+
+RUN apt-get update && \
+      deps="wget unzip make gcc libavahi-compat-libdnssd-dev" && \
+      apt-get install -y --no-install-recommends ${deps} && \
+      rm -rf /var/lib/apt/lists/* && \
+      wget https://github.com/uyorum/irkit-ha/archive/master.zip && \
+      unzip master.zip && \
+      mv irkit-ha-master /irkit-ha && \
+      rm -rf irkit-ha-master && \
+      cd /irkit-ha && \
+      bundle install --without test development && \
+      apt-get purge -y ${deps}
+
+ENV RACK_ENV production
+EXPOSE 4567
+WORKDIR /irkit-ha
+CMD ["ruby", "app.rb", "-o", "0.0.0.0"]
