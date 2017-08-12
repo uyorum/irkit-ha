@@ -3,8 +3,7 @@ require 'sinatra/config_file'
 require 'hashie'
 require 'irkit'
 
-environment = ENV['RACK_ENV'] || 'development'
-config_file "config/#{environment}.yml"
+config_file "config/#{settings.environment}.yml"
 
 def symbolize_keys(hash)
   return nil unless hash
