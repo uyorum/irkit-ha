@@ -6,7 +6,7 @@ environment = ENV['RACK_ENV'] || 'development'
 config_file "config/#{environment}.yml"
 
 before %r{/devices/([\w]+).*} do
-  @target_device = settings.devices.select {|device| device['name'] == params['captures'].first}.first
+  @target_device = settings.devices.select {|device| device['name'] == params[:captures].first}.first
   unless @target_device
     halt 404, { message: 'device not found' }.to_json
   end
@@ -29,9 +29,7 @@ get '/devices/:device_name/commands' do
 end
 
 post '/devices/:device_name/exec' do
-  payload = JSON.parse(request.body.read)
-
-  ir_json = @target_device['commands'][payload['command']]
+  ir_json = @target_device['commands'][params[:command]]
   unless ir_json
     status 400
     return { message: "unknown command" }.to_json

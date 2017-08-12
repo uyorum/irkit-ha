@@ -68,7 +68,7 @@ RSpec.describe "My Sinatra Application" do
 
   describe "post /devices/:name/exec" do
     context "with valid request", vcr: true do
-      let(:params) {{ command: 'command1' }.to_json}
+      let(:params) {{ command: 'command1' }}
 
       it "returns status 200" do
         post '/devices/livingroom/exec', params
@@ -82,7 +82,7 @@ RSpec.describe "My Sinatra Application" do
     end
 
     context "with undefined command" do
-      let(:params) {{ command: 'invalid_command' }.to_json}
+      let(:params) {{ command: 'invalid_command' }}
 
       it "returns status 400" do
         post '/devices/livingroom/exec', params
@@ -96,7 +96,7 @@ RSpec.describe "My Sinatra Application" do
     end
 
     context "if failed to issue request" do
-      let(:params) {{ command: 'command1' }.to_json}
+      let(:params) {{ command: 'command1' }}
 
       before :each do
         allow_any_instance_of(IRKit::Device)
