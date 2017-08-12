@@ -1,0 +1,28 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://irkit/messages
+    body:
+      encoding: UTF-8
+      string: '{"format":"raw","freq":38,"data":[11111,22222]}'
+    headers:
+      X-Requested-With:
+      - ruby-irkit
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - IRKit/3.0.0.0.g85190b1
+      Content-Type:
+      - text/plain
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Sat, 12 Aug 2017 02:55:47 GMT
+recorded_with: VCR 3.0.3

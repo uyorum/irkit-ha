@@ -1,3 +1,7 @@
 devices:
   - name: livingroom
+    address: irkit
+    commands:
+      command1: '{"format":"raw","freq":38,"data":[11111,22222]}'
+      command2: '{"format":"raw","freq":38,"data":[33333,44444,55555]}'
   - name: bedroom
