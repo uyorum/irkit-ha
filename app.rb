@@ -1,44 +1,57 @@
 require 'sinatra'
 require 'sinatra/config_file'
+require 'hashie'
 require 'irkit'
 
 environment = ENV['RACK_ENV'] || 'development'
 config_file "config/#{environment}.yml"
 
+def symbolize_keys(hash)
+  return nil unless hash
+  hash.map{|k,v| [k.to_sym, v] }.to_h
+end
+
+all_devices = {}
+settings.devices.each do |device|
+  name = device['name'].to_sym
+  new_entry = Hashie::Mash.new(
+    name: name,
+    api: IRKit::Device.new(address: device['address']),
+    commands: symbolize_keys(device['commands']),
+  )
+  all_devices[name] = new_entry
+end
+
 before %r{/devices/([\w]+).*} do
-  @target_device = settings.devices.select {|device| device['name'] == params[:captures].first}.first
+  device_name = params[:captures].first.to_sym
+  @target_device = all_devices[device_name]
   halt 404, { message: 'device not found' }.to_json unless @target_device
 end
 
 before '/devices/:device_name/exec' do
-  ir_json = @target_device['commands'][params[:command]]
+  command = params[:command].to_sym
+  ir_json = @target_device.commands[command]
   halt 400, { message: "unknown command" }.to_json unless ir_json
   @ir_data = JSON.parse(ir_json)
 end
 
 get '/devices' do
-  devices = []
-  settings.devices.each do |device|
-    devices << device['name']
-  end
-  devices.to_json
+  all_devices.keys.to_json
 end
 
 get '/devices/:device_name' do
-  return { name: @target_device['name'] }.to_json
+  { name: @target_device.name }.to_json
 end
 
 get '/devices/:device_name/commands' do
-  return (@target_device['commands'] || [] ).keys.to_json
+  (@target_device.commands || {}).keys.to_json
 end
 
 post '/devices/:device_name/exec' do
-  irkit = IRKit::Device.new(address: @target_device['address'])
-  response = irkit.post_messages(@ir_data)
+  response = @target_device.api.post_messages(@ir_data)
   unless response.response.code == "200"
-    status 500
-    return { message: 'failed to execute command' }.to_json
+    halt 500, { message: 'failed to execute command' }.to_json
   end
 
-  return { message: 'executed command' }.to_json
+  { message: 'executed command' }.to_json
 end
