@@ -1,29 +1,31 @@
 require File.expand_path '../spec_helper.rb', __FILE__
 
 RSpec.describe "Sinatra Application" do
+  let(:all_device_name) { ['device1', 'device2'] }
+  let(:commands_of_first_device) { ['command1', 'command2'] }
+
   describe "get /devices" do
     it "returns status 200" do
-      get '/devices' do
-        expect(last_response.status).to eq(200)
-      end
+      get '/devices'
+      expect(last_response.status).to eq(200)
     end
 
     it "returns list of device name" do
       get '/devices'
-      expect(last_response.body).to eq(['livingroom', 'bedroom'].to_json)
+      expect(last_response.body).to eq(all_device_name.to_json)
     end
   end
 
   describe "get /devices/:device_name" do
     context "with valid device name" do
       it "returns status 200" do
-        get '/devices/livingroom'
+        get "/devices/#{all_device_name.first}"
         expect(last_response.status).to eq(200)
       end
 
       it "returns the property of the device" do
-        get '/devices/livingroom'
-        expect(last_response.body).to eq({ name: 'livingroom' }.to_json)
+        get "/devices/#{all_device_name.first}"
+        expect(last_response.body).to eq({ name: all_device_name.first }.to_json)
       end
     end
 
@@ -43,13 +45,13 @@ RSpec.describe "Sinatra Application" do
   describe "get /devices/:device_name/commands" do
     context "with valid device name" do
       it "returns status 200" do
-        get '/devices/livingroom/commands'
+        get "/devices/#{all_device_name.first}/commands"
         expect(last_response.status).to eq(200)
       end
 
       it "returns the list of commands" do
-        get '/devices/livingroom/commands'
-        expect(last_response.body).to eq(['command1', 'command2'].to_json)
+        get "/devices/#{all_device_name.first}/commands"
+        expect(last_response.body).to eq(commands_of_first_device.to_json)
       end
     end
 
@@ -68,16 +70,30 @@ RSpec.describe "Sinatra Application" do
 
   describe "post /devices/:device_name/exec" do
     context "with valid request", vcr: true do
-      let(:params) {{ command: 'command1' }}
+      let(:params) {{ command: commands_of_first_device.first }}
 
       it "returns status 200" do
-        post '/devices/livingroom/exec', params
+        post "/devices/#{all_device_name.first}/exec", params
         expect(last_response.status).to eq(200)
       end
 
       it "returns the message" do
-        post '/devices/livingroom/exec', params
+        post "/devices/#{all_device_name.first}/exec", params
         expect(last_response.body).to eq({ message: 'executed command' }.to_json)
+      end
+    end
+
+    context "with invalid device name" do
+      let(:params) {{ command: commands_of_first_device.first }}
+
+      it "returns status 404" do
+        get '/devices/invalid_name/exec', params
+        expect(last_response.status).to eq(404)
+      end
+
+      it "returns the error message" do
+        get '/devices/invalid_name/exec', params
+        expect(last_response.body).to eq({ message: 'device not found' }.to_json)
       end
     end
 
@@ -85,18 +101,18 @@ RSpec.describe "Sinatra Application" do
       let(:params) {{ command: 'invalid_command' }}
 
       it "returns status 400" do
-        post '/devices/livingroom/exec', params
+        post "/devices/#{all_device_name.first}/exec", params
         expect(last_response.status).to eq(400)
       end
 
       it "returns the message" do
-        post '/devices/livingroom/exec', params
+        post "/devices/#{all_device_name.first}/exec", params
         expect(last_response.body).to eq({ message: 'unknown command' }.to_json)
       end
     end
 
     context "if failed to issue request" do
-      let(:params) {{ command: 'command1' }}
+      let(:params) {{ command: commands_of_first_device.first }}
 
       before :each do
         allow_any_instance_of(IRKit::Device)
@@ -104,12 +120,12 @@ RSpec.describe "Sinatra Application" do
       end
 
       it "returns status 500" do
-        post '/devices/livingroom/exec', params
+        post "/devices/#{all_device_name.first}/exec", params
         expect(last_response.status).to eq(500)
       end
 
       it "returns the message" do
-        post '/devices/livingroom/exec', params
+        post "/devices/#{all_device_name.first}/exec", params
         expect(last_response.body).to eq({ message: 'failed to execute command' }.to_json)
       end
     end
